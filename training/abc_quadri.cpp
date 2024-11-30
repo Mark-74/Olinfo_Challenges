@@ -1,26 +1,44 @@
-// Punti: 60.0
-    #include <bits/stdc++.h>
-    using namespace std;
-    int quadri(int N, long long M, int V[]){
-        for(int i = 0; i < N; i++){
-            if(V[i] > M){
-                return 0;
-            }
-        }
-        int B = N;
-        for(int i = 0; i < N; i++){
-            int current = V[i];
-            bool flag = false;
-            for(int j = 1; j < B && (i+j) < N; j++){
-                current+= V[i+j];
-                if(current > M){
-                    B--;
-                    flag = true;
-                }
-            }
-            if(!flag && i == 0){
+// Punti: 100.0
+int quadri(int N, long long M, int V[]) {
+    int i_sx = 0, i_dx = N;
+    while(i_dx - i_sx > 1){
+        long long cuum = 0;
+        int start_idx = 0;
+        int mid = (i_sx + i_dx+1) / 2;
+        //fill sliding window up to mid
+        for(int i = 0; i < mid; i++)
+            cuum += V[i];
+        for(int i = mid; i < N; i++){
+            if(cuum <= M){
+                cuum += V[i];
+                cuum -= V[start_idx++];
+            } else
+            {
                 break;
             }
         }
-        return B;
+        
+        if(cuum > M)
+            i_dx = mid;
+        else
+            i_sx = mid;
     }
+    long long cuum = 0;
+    int start_idx = 0;
+    //fill sliding window up to i_dx
+    for(int i = 0; i < i_dx; i++)
+        cuum += V[i];
+    for(int i = i_dx; i < N; i++){
+        if(cuum <= M){
+            cuum += V[i];
+            cuum -= V[start_idx++];
+        } else
+        {
+            return i_sx;
+        }
+    }
+    if(cuum > M)
+        return i_sx;
+    else
+        return i_dx;
+}
